@@ -24,7 +24,6 @@ def get_transcript_docx(links):
     for i, link in enumerate(links, 1):
         video_id = extract_video_id(link)
         if not video_id:
-            doc.add_heading(f"Video {i}: Invalid URL", level=2)
             continue
         try:
             transcript = YouTubeTranscriptApi.get_transcript(video_id)
@@ -41,13 +40,13 @@ def get_transcript_docx(links):
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    file = request.files.get('file')
+    file = request.files['file']
     if not file:
         return "No file uploaded", 400
 
     links = file.read().decode('utf-8').splitlines()
     links = [link.strip() for link in links if link.strip()]
-
+    
     docx_path = get_transcript_docx(links)
     return send_file(docx_path, as_attachment=True, download_name="transcripts.docx")
 
